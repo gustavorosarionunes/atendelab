@@ -1,128 +1,82 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
--- Banco de dados: `atendelab`
+DROP DATABASE IF EXISTS atendelab;
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
+CREATE DATABASE atendelab
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_general_ci;
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+USE atendelab;
 
--- --------------------------------------------------------
--- ADICIONADO: Limpa as tabelas antes de recriar para evitar erro de duplicação
-DROP TABLE IF EXISTS `atendimentos`, `tipos_atendimentos`, `pessoas`, `usuarios`;
--- --------------------------------------------------------
+CREATE TABLE usuarios (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(100) NOT NULL,
+  email VARCHAR(100) NOT NULL UNIQUE,
+  senha VARCHAR(255) NOT NULL,
+  perfil ENUM('admin', 'atendente') DEFAULT 'atendente',
+  status ENUM('ativo', 'inativo') DEFAULT 'ativo',
+  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
 
---
--- Estrutura para tabela `usuarios`
---
-CREATE TABLE `usuarios` (
-  `id` int(11) NOT NULL,
-  `nome` varchar(100) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `senha` varchar(255) NOT NULL,
-  `perfil` enum('admin','aluno','atendente') DEFAULT 'atendente',
-  `status` enum('ativo','inativo') DEFAULT 'ativo',
-  `criado_em` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+CREATE TABLE pessoas (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(150) NOT NULL,
+  documento VARCHAR(30) NOT NULL UNIQUE,
+  telefone VARCHAR(20),
+  email VARCHAR(150) NOT NULL,
+  curso VARCHAR(120),
+  periodo VARCHAR(20),
+  observacoes TEXT,
+  status ENUM ('ativo', 'inativo') DEFAULT 'ativo',
+  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
 
--- O INSERT manual com a senha 'root' foi removido propositalmente.
--- Crie o usuário admin@atendelab.com pelo Thunder Client.
+CREATE TABLE tipos_atendimentos (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(100) NOT NULL,
+  descricao TEXT,
+  status ENUM ('ativo', 'inativo') DEFAULT 'ativo',
+  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
 
--- --------------------------------------------------------
+CREATE TABLE atendimentos (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  pessoa_id INT NOT NULL,
+  tipo_atendimento_id INT NOT NULL,
+  usuario_id INT NOT NULL,
+  descricao TEXT NOT NULL,
+  status ENUM('aberto', 'em_andamento', 'concluido') DEFAULT 'aberto',
+  data_atendimento DATE NOT NULL,
+  horario_atendimento TIME NOT NULL,
+  observacao_final TEXT,
+  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_atendimentos_pessoa FOREIGN KEY (pessoa_id) REFERENCES pessoas (id),
+  CONSTRAINT fk_atendimentos_tipo FOREIGN KEY (tipo_atendimento_id) REFERENCES tipos_atendimentos (id),
+  CONSTRAINT fk_atendimentos_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+);
 
---
--- Estrutura para tabela `pessoas`
---
-CREATE TABLE `pessoas` (
-  `id` int(11) NOT NULL,
-  `nome` varchar(100) NOT NULL,
-  `cpf` varchar(14) NOT NULL,
-  `telefone` varchar(20) DEFAULT NULL,
-  `tipo` enum('aluno','professor','servidor') DEFAULT 'aluno',
-  `status` enum('ativo','inativo') DEFAULT 'ativo',
-  `criado_em` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+-- Insere o Administrador com a sua senha atual
+INSERT INTO usuarios (nome, email, senha, perfil, status)
+VALUES (
+  'Administrador',
+  '$2y$10$9B.Rla5/gK2J6f7Q7kIWiunPr.N4uwvXjxo3gC2wBtUBqjxhanGNq',
+  'admin@atendelab.com',
+  'admin',
+  'ativo'
+);
 
--- --------------------------------------------------------
+-- Insere os tipos de atendimento fictícios
+INSERT INTO tipos_atendimentos (nome, descricao, status) VALUES
+('Dúvida acadêmica', 'Dúvidas sobre disciplinas, conteúdos e atividades.', 'ativo'),
+('Orientação de atividade', 'Orientações sobre trabalhos, TCC e projetos.', 'ativo'),
+('Suporte técnico', 'Problemas com sistemas, equipamentos e acessos.', 'ativo'),
+('Matrícula e documentação', 'Solicitações de matrícula, declarações e históricos.', 'ativo'),
+('Acesso ao laboratório', 'Liberação de uso e agendamento de laboratórios.', 'ativo');
 
---
--- Estrutura para tabela `tipos_atendimentos`
---
-CREATE TABLE `tipos_atendimentos` (
-  `id` int(11) NOT NULL,
-  `nome` varchar(100) NOT NULL,
-  `descricao` text DEFAULT NULL,
-  `status` enum('ativo','inativo') DEFAULT 'ativo'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `atendimentos`
---
-CREATE TABLE `atendimentos` (
-  `id` int(11) NOT NULL,
-  `pessoa_id` int(11) NOT NULL,
-  `tipo_atendimento_id` int(11) NOT NULL,
-  `usuario_id` int(11) NOT NULL,
-  `descricao` text NOT NULL,
-  `status` enum('pendente','em_andamento','concluido','cancelado') DEFAULT 'pendente',
-  `data_criacao` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Índices para tabelas despejadas
---
-
-ALTER TABLE `usuarios`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
-
-ALTER TABLE `pessoas`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `cpf` (`cpf`);
-
-ALTER TABLE `tipos_atendimentos`
-  ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `atendimentos`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_atend_pessoa` (`pessoa_id`),
-  ADD KEY `fk_atend_tipo` (`tipo_atendimento_id`),
-  ADD KEY `fk_atend_usuario` (`usuario_id`);
-
---
--- AUTO_INCREMENT para tabelas despejadas
---
-
-ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
-ALTER TABLE `pessoas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
-ALTER TABLE `tipos_atendimentos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
-ALTER TABLE `atendimentos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- Restrições para tabelas despejadas
---
-
-ALTER TABLE `atendimentos`
-  ADD CONSTRAINT `fk_atend_pessoa` FOREIGN KEY (`pessoa_id`) REFERENCES `pessoas` (`id`),
-  ADD CONSTRAINT `fk_atend_tipo` FOREIGN KEY (`tipo_atendimento_id`) REFERENCES `tipos_atendimentos` (`id`),
-  ADD CONSTRAINT `fk_atend_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`);
-
-COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+-- Insere as pessoas fictícias
+INSERT INTO pessoas (nome, documento, telefone, email, curso, periodo, status)
+VALUES
+('João da Silva', '123.456.789-00', '(47) 99999-0001', 'joao.silva@exemplo.com', 'Engenharia de Software', '5º', 'ativo'),
+('Ana Carolina', '987.654.321-00', '(47) 99999-0002', 'ana.carolina@exemplo.com', 'Sistemas de Informação', '7º', 'ativo');
