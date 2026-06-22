@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Tempo de geração: 16/06/2026 às 01:31
+-- Tempo de geração: 09/06/2026 às 01:22
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -32,12 +32,9 @@ CREATE TABLE `atendimentos` (
   `pessoa_id` int(11) NOT NULL,
   `tipo_atendimento_id` int(11) NOT NULL,
   `usuario_id` int(11) NOT NULL,
-  `data_atendimento` date NOT NULL,
-  `hora_atendimento` time NOT NULL,
   `descricao` text DEFAULT NULL,
-  `observacao` text DEFAULT NULL,
-  `status` varchar(100) NOT NULL,
-  `criado_em` timestamp NOT NULL DEFAULT current_timestamp()
+  `data_atendimento` datetime DEFAULT current_timestamp(),
+  `status` enum('aberto','em_andamento','finalizado') DEFAULT 'aberto'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -49,13 +46,17 @@ CREATE TABLE `atendimentos` (
 CREATE TABLE `pessoas` (
   `id` int(11) NOT NULL,
   `nome` varchar(100) NOT NULL,
-  `documento` varchar(20) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
   `telefone` varchar(20) DEFAULT NULL,
-  `curso` varchar(100) DEFAULT NULL,
-  `periodo` varchar(100) DEFAULT NULL,
-  `status` varchar(100) NOT NULL,
   `criado_em` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `pessoas`
+--
+
+INSERT INTO `pessoas` (`id`, `nome`, `email`, `telefone`, `criado_em`) VALUES
+(1, 'admin', 'tuamae@gmail.com', NULL, '2026-06-08 23:21:41');
 
 -- --------------------------------------------------------
 
@@ -67,7 +68,7 @@ CREATE TABLE `tipos_atendimentos` (
   `id` int(11) NOT NULL,
   `nome` varchar(100) NOT NULL,
   `descricao` text DEFAULT NULL,
-  `status` varchar(100) NOT NULL
+  `criado_em` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -81,7 +82,7 @@ CREATE TABLE `usuarios` (
   `nome` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
   `senha` varchar(255) NOT NULL,
-  `perfil` enum('admin','atendente') DEFAULT 'atendente',
+  `perfil` enum('admin','aluno','atendente') DEFAULT 'atendente',
   `status` enum('ativo','inativo') DEFAULT 'ativo',
   `criado_em` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -91,7 +92,8 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id`, `nome`, `email`, `senha`, `perfil`, `status`, `criado_em`) VALUES
-(1, 'Administrador', 'admin@atendelab.com', '$2y$10$9B.Rla5/gK2J6f7Q7kIWiunPr.N4uwvXjxo3gC2wBtUBqjxhanGNq', 'admin', 'ativo', '2026-06-01 23:37:14');
+(1, 'Administrador', 'admin@atendelab.com', '$2y$10$J9P2kU2BAMZ3TZcuxTsW4e1D/lka8EocYHzvyoOZmCNcWDQz3RuVC', 'admin', 'ativo', '2026-06-02 01:56:36'),
+(3, 'VIni', 'teste@gmail.com', '$2y$10$ZffoJtQJRP27.KvTY9iq7uYhUNbkKedCIMF5256jB7POIn7cefrT.', 'aluno', 'inativo', '2026-06-08 23:05:23');
 
 --
 -- Índices para tabelas despejadas
@@ -102,16 +104,15 @@ INSERT INTO `usuarios` (`id`, `nome`, `email`, `senha`, `perfil`, `status`, `cri
 --
 ALTER TABLE `atendimentos`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_atendimentos_pessoas` (`pessoa_id`),
-  ADD KEY `fk_atendimentos_tipos` (`tipo_atendimento_id`),
-  ADD KEY `fk_atendimentos_usuarios` (`usuario_id`);
+  ADD KEY `fk_atendimento_pessoa` (`pessoa_id`),
+  ADD KEY `fk_atendimento_tipo` (`tipo_atendimento_id`),
+  ADD KEY `fk_atendimento_usuario` (`usuario_id`);
 
 --
 -- Índices de tabela `pessoas`
 --
 ALTER TABLE `pessoas`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `documento` (`documento`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Índices de tabela `tipos_atendimentos`
@@ -140,7 +141,7 @@ ALTER TABLE `atendimentos`
 -- AUTO_INCREMENT de tabela `pessoas`
 --
 ALTER TABLE `pessoas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de tabela `tipos_atendimentos`
@@ -152,7 +153,7 @@ ALTER TABLE `tipos_atendimentos`
 -- AUTO_INCREMENT de tabela `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Restrições para tabelas despejadas
@@ -162,9 +163,9 @@ ALTER TABLE `usuarios`
 -- Restrições para tabelas `atendimentos`
 --
 ALTER TABLE `atendimentos`
-  ADD CONSTRAINT `fk_atendimentos_pessoas` FOREIGN KEY (`pessoa_id`) REFERENCES `pessoas` (`id`),
-  ADD CONSTRAINT `fk_atendimentos_tipos` FOREIGN KEY (`tipo_atendimento_id`) REFERENCES `tipos_atendimentos` (`id`),
-  ADD CONSTRAINT `fk_atendimentos_usuarios` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`);
+  ADD CONSTRAINT `fk_atendimento_pessoa` FOREIGN KEY (`pessoa_id`) REFERENCES `pessoas` (`id`),
+  ADD CONSTRAINT `fk_atendimento_tipo` FOREIGN KEY (`tipo_atendimento_id`) REFERENCES `tipos_atendimentos` (`id`),
+  ADD CONSTRAINT `fk_atendimento_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
