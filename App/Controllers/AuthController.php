@@ -42,8 +42,8 @@ class AuthController
             exit;
         }
 
-        $email = trim($_POST['email']?? '');
-        $senha = $_POST['senha']?? '';
+        $email = trim($_POST['email'] ?? '');
+        $senha = $_POST['senha'] ?? '';
 
         if($email === '' || $senha === '') {
             $_SESSION['erro_login'] = 'Informe o e-mail e a senha';
