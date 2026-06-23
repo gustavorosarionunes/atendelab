@@ -1,71 +1,67 @@
 <?php
 
-require_once __DIR__ . '/app/Controllers/AuthController.php';
-require_once __DIR__ . '/app/Controllers/UsuariosController.php';
-require_once __DIR__ . '/app/Middleware/auth.php';
+require_once __DIR__ . '/App/Controllers/AuthController.php';
+require_once __DIR__ . '/App/Controllers/UsuariosController.php';
+require_once __DIR__ . '/App/Middleware/auth.php';
 
-$controller = $_GET['controller'] ?? 'auth';
-$action = $_GET['action'] ?? 'login';
+$controller = $_GET['controller'] ?? 'home';
+$action = $_GET['action'] ?? 'index';
+
 
 switch ($controller) {
-    case 'auth':
+    case 'auth';
         $authController = new AuthController();
 
-        switch ($action) {
+        switch($action) {
             case 'login':
-                $authController->exibirLogin();
-                break;
+            $authController->exibirLogin();
+            break;
 
             case 'entrar':
-                $authController->entrar();
-                break;
+            $authController->entrar();
+            break;
 
             case 'dashboard':
-                $authController->dashboard();
-                break;
+            $authController->dashboard();
+            break;
 
             case 'logout':
-                $authController->logout();
-                break;
+            $authController->logout();
+            break;
 
             default:
                 http_response_code(404);
-                echo 'Acao de autenticacao nao encontrada.';
-        }
-        break;
+                echo 'Ação de autenticação não encontrada.';
 
+        }
+
+        break;
+    
     case 'usuarios':
         exigirAutenticacao();
         $usuariosController = new UsuariosController();
+        
+        switch ($action){
+        case 'listar':
+            $usuariosController->listar();
+            break;
 
-        switch ($action) {
-            case 'listar':
-                $usuariosController->listar();
-                break;
-
-            case 'buscarPorId':
-                $usuariosController->buscarPorId();
-                break;
-
-            case 'criar':
-                $usuariosController->criar();
-                break;
-
-            case 'atualizar':
-                $usuariosController->atualizar();
-                break;
-
-            case 'excluir':
-                $usuariosController->excluir();
-                break;
-
-            default:
-                http_response_code(404);
-                echo 'Acao de usuarios nao encontrada.';
-        }
-        break;
-
-    default:
+        case 'buscar':
+            $usuariosController->buscarPorId();
+            break;
+        case 'criar':
+            $usuariosController->criar();
+            break;
+        case 'atualizar':
+            $usuariosController->atualizar();
+            break;
+        case 'excluir':
+            $usuariosController->excluir();
+            break;
+        
+        default:
         http_response_code(404);
-        echo 'Controller nao encontrado.';
+        echo 'Controller não encontrado';
+        
+        } 
 }
