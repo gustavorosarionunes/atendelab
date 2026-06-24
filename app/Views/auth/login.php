@@ -24,43 +24,43 @@
 
                         <?php if (!empty($erro)): ?>
                             <div class="alert alert-danger">
-                                <?= htmlspecialchars(
-                                    $erro,
-                                    ENT_QUOTES,
-                                    'UTF-8'
-                                ) ?>
+                                <?= htmlspecialchars($erro, ENT_QUOTES, 'UTF-8') ?>
                             </div>
                         <?php endif; ?>
 
                         <?php if (!empty($mensagem)): ?>
                             <div class="alert alert-success">
-                                <?= htmlspecialchars(
-                                    $mensagem,
-                                    ENT_QUOTES,
-                                    'UTF-8'
-                                ) ?>
+                                <?= htmlspecialchars($mensagem, ENT_QUOTES, 'UTF-8') ?>
                             </div>
                         <?php endif; ?>
 
                         <form method="POST" action="?controller=auth&action=entrar">
 
                             <div class="mb-3">
-                                <label for="email" class="form-label">
-                                    E-mail
-                                </label>
-                                <input type="email" name="email" id="email" class="form-control" required>
+                                <label for="email" class="form-label">E-mail</label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    id="email"
+                                    class="form-control"
+                                    required
+                                    autofocus>
                             </div>
 
                             <div class="mb-3">
-                                <label for="senha" class="form-label">
-                                    Senha
-                                </label>
-                                <input type="password" name="senha" id="senha" class="form-control" required>
+                                <label for="senha" class="form-label">Senha</label>
+                                <input
+                                    type="password"
+                                    name="senha"
+                                    id="senha"
+                                    class="form-control"
+                                    required>
                             </div>
 
                             <button type="submit" class="btn btn-primary w-100">
                                 Entrar
                             </button>
+
                         </form>
                     </div>
                 </div>
