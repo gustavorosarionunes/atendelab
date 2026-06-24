@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Tempo de geração: 24/06/2026 às 02:06
+-- Tempo de geração: 24/06/2026 às 02:42
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -73,7 +73,9 @@ CREATE TABLE `pessoas` (
 --
 
 INSERT INTO `pessoas` (`id`, `nome`, `documento`, `telefone`, `email`, `curso`, `periodo`, `observacoes`, `status`, `criado_em`, `atualizado_em`) VALUES
-(1, 'joaozinho atualizado', '', '40028922', 'joaozinho123@gmail.com', NULL, NULL, NULL, 'ativo', '2026-06-10 00:04:25', '2026-06-23 23:56:51');
+(1, 'joaozinho atualizado', '', '40028922', 'joaozinho123@gmail.com', NULL, NULL, NULL, 'ativo', '2026-06-10 00:04:25', '2026-06-23 23:56:51'),
+(2, 'Carlos Henrique Sousa', '321.654.987.10', '(47) 99999-0010', 'carlos.souza@exemplo.com', 'Engenharia de Software', '3°', 'Aluno interessado em orientação sobre atividades                     complementares.', 'ativo', '2026-06-24 00:36:27', '2026-06-24 00:36:27'),
+(3, 'Mariana Oliveira Costa', '741.852.963-20', '(47) 99999-0011', 'mariana.oliveira@exemplo.com', 'Sistema da Informação', '5°', NULL, 'ativo', '2026-06-24 00:36:27', '2026-06-24 00:36:27');
 
 -- --------------------------------------------------------
 
@@ -95,7 +97,9 @@ CREATE TABLE `tipos_atendimentos` (
 --
 
 INSERT INTO `tipos_atendimentos` (`id`, `nome`, `descricao`, `status`, `criado_em`, `atualizado_em`) VALUES
-(1, '', 'consultoria academica atualizada', 'ativo', '2026-06-10 00:14:25', '2026-06-23 23:58:31');
+(1, '', 'consultoria academica atualizada', 'ativo', '2026-06-10 00:14:25', '2026-06-23 23:58:31'),
+(2, 'Revisão de avaliação', 'Solicitação de revisão de provas, trabalhos e atividades 		        avaliativas.', 'ativo', '2026-06-24 00:36:26', '2026-06-24 00:36:26'),
+(3, 'Apoio à extensão', 'Orientação relacionadas a projetos de extenção e atividades            comunitárias.', 'ativo', '2026-06-24 00:36:26', '2026-06-24 00:36:26');
 
 -- --------------------------------------------------------
 
@@ -170,13 +174,13 @@ ALTER TABLE `atendimentos`
 -- AUTO_INCREMENT de tabela `pessoas`
 --
 ALTER TABLE `pessoas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de tabela `tipos_atendimentos`
 --
 ALTER TABLE `tipos_atendimentos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de tabela `usuarios`

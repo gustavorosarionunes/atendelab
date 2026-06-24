@@ -116,7 +116,7 @@ class AuthController
     public function dashboard(): void
     {
         // Bloqueia o acesso caso o usuário não esteja logado.
-        exigirAutenticacao();
+        // exigirAutenticacao();
 
         // Recupera os dados do usuário autenticado.
         $usuario = usuarioAtual();
