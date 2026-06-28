@@ -1,26 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
+// ============================================================
+// AtendeLab - Middleware de Autenticação
+// ============================================================
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 function usuarioAutenticado(): bool
 {
-    return isset($_SESSION['usuario'])
-        && is_array($_SESSION['usuario']);
+    return isset($_SESSION['usuario']['id']);
 }
 
 function exigirAutenticacao(): void
 {
     if (!usuarioAutenticado()) {
-        $_SESSION['mensagem'] = 'Faca login para acessar a area restrita.';
-
-        header('Location: ?controller=auth&action=login');
+        header('Location: /atendelab/public/?controller=auth&action=login');
         exit;
     }
 }
 
-function usuarioAtual(): ?array
+function usuarioAtual(): array
 {
-    return $_SESSION['usuario'] ?? null;
+    return $_SESSION['usuario'] ?? [];
 }

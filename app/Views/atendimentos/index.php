@@ -8,7 +8,9 @@ require __DIR__ . '/../layouts/header.php';
         <h1 class="h3 mb-1">Atendimentos</h1>
         <p class="text-secondary mb-0">Registro e acompanhamento dos atendimentos acadêmicos.</p>
     </div>
-    <button class="btn btn-success" type="button" onclick="novoAtendimento()">Novo atendimento</button>
+    <button class="btn btn-success" type="button" onclick="novoAtendimento()">
+        Novo atendimento
+    </button>
 </div>
 
 <div id="alerta"></div>
@@ -21,11 +23,13 @@ require __DIR__ . '/../layouts/header.php';
                 <div class="col-md-6">
                     <label class="form-label">Pessoa *</label>
                     <select class="form-select" name="pessoa_id" id="pessoaSelect" required>
+                        <option value="">Selecione</option>
                     </select>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Tipo *</label>
                     <select class="form-select" name="tipo_atendimento_id" id="tipoSelect" required>
+                        <option value="">Selecione</option>
                     </select>
                 </div>
                 <div class="col-md-4">
@@ -43,7 +47,8 @@ require __DIR__ . '/../layouts/header.php';
             </div>
             <div class="d-flex gap-2 mt-3">
                 <button class="btn btn-success" type="submit">Registrar</button>
-                <button class="btn btn-outline-secondary" type="button" onclick="fecharFormulario()">Cancelar</button>
+                <button class="btn btn-outline-secondary" type="button"
+                        onclick="fecharFormulario()">Cancelar</button>
             </div>
         </form>
     </div>
@@ -72,6 +77,7 @@ require __DIR__ . '/../layouts/header.php';
     </div>
 </div>
 
+<!-- Modal: alterar status -->
 <div class="modal fade" id="modalStatus" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -93,11 +99,12 @@ require __DIR__ . '/../layouts/header.php';
                     <div>
                         <label class="form-label">Observação final</label>
                         <textarea class="form-control" name="observacao_final" rows="3"
-                            placeholder="Obrigatória ao concluir"></textarea>
+                                  placeholder="Obrigatória ao concluir"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">Cancelar</button>
                     <button class="btn btn-success" type="submit">Salvar</button>
                 </div>
             </form>
@@ -106,128 +113,136 @@ require __DIR__ . '/../layouts/header.php';
 </div>
 
 <script>
-    const formAtendimento = document.getElementById('formAtendimento');
-    const cardFormulario  = document.getElementById('cardFormulario');
+const formAtendimento = document.getElementById('formAtendimento');
+const cardFormulario  = document.getElementById('cardFormulario');
 
-    const statusModal = () => bootstrap.Modal.getOrCreateInstance(document.getElementById('modalStatus'));
+const statusModal = () =>
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalStatus'));
 
-    function novoAtendimento() {
-        cardFormulario.classList.remove('d-none');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+function novoAtendimento() {
+    cardFormulario.classList.remove('d-none');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function fecharFormulario() {
+    cardFormulario.classList.add('d-none');
+    formAtendimento.reset();
+}
+
+// Retorna o primeiro valor definido dentre as chaves fornecidas
+function labelRegistro(obj, ...keys) {
+    for (const key of keys) {
+        if (obj[key] !== undefined && obj[key] !== null) return obj[key];
     }
+    return '';
+}
 
-    function fecharFormulario() {
-        cardFormulario.classList.add('d-none');
-        formAtendimento.reset();
-    }
+async function carregarCombos() {
+    const [pessoasResp, tiposResp] = await Promise.all([
+        AtendeLabApi.get('pessoas', 'listar'),
+        AtendeLabApi.get('tipos', 'listar'),
+    ]);
 
-    function labelRegistro(obj, ...keys) {
-        for (const key of keys) {
-            if (obj[key] !== undefined && obj[key] !== null) return obj[key];
+    const pessoas = AtendeLabApi.toList(pessoasResp).filter(p => p.status !== 'inativo');
+    const tipos   = AtendeLabApi.toList(tiposResp).filter(t => t.status !== 'inativo');
+
+    document.getElementById('pessoaSelect').innerHTML =
+        '<option value="">Selecione</option>' +
+        pessoas.map(p => `<option value="${Number(p.id)}">${AtendeLabApi.escape(p.nome)}</option>`).join('');
+
+    document.getElementById('tipoSelect').innerHTML =
+        '<option value="">Selecione</option>' +
+        tipos.map(t => `<option value="${Number(t.id)}">${AtendeLabApi.escape(t.nome)}</option>`).join('');
+}
+
+async function carregarAtendimentos() {
+    try {
+        const resposta     = await AtendeLabApi.get('atendimentos', 'listar');
+        const atendimentos = AtendeLabApi.toList(resposta);
+        const tbody        = document.getElementById('tabelaAtendimentos');
+
+        if (!atendimentos.length) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4">Nenhum atendimento registrado.</td></tr>';
+            return;
         }
-        return '';
-    }
 
-    async function carregarCombos() {
-        const [pessoasResp, tiposResp] = await Promise.all([
-            AtendeLabApi.get('pessoas', 'listar'),
-            AtendeLabApi.get('tipos', 'listar')
-        ]);
+        tbody.innerHTML = atendimentos.map(a => {
+            const pessoa      = labelRegistro(a, 'pessoa', 'pessoa_nome', 'nome_pessoa');
+            const tipo        = labelRegistro(a, 'tipo', 'tipo_nome', 'tipo_atendimento', 'nome_tipo');
+            const responsavel = labelRegistro(a, 'responsavel', 'usuario', 'usuario_nome', 'nome_usuario');
+            const data        = labelRegistro(a, 'data_atendimento', 'data');
 
-        const pessoas = AtendeLabApi.toList(pessoasResp).filter(p => p.status !== 'inativo');
-        const tipos   = AtendeLabApi.toList(tiposResp).filter(t => t.status !== 'inativo');
+            const classeStatus = a.status === 'concluido'
+                ? 'text-bg-success'
+                : a.status === 'em_andamento'
+                ? 'text-bg-warning'
+                : 'text-bg-primary';
 
-        document.getElementById('pessoaSelect').innerHTML =
-            '<option value="">Selecione</option>' +
-            pessoas.map(p => `<option value="${Number(p.id)}">${AtendeLabApi.escape(p.nome)}</option>`).join('');
-
-        document.getElementById('tipoSelect').innerHTML =
-            '<option value="">Selecione</option>' +
-            tipos.map(t => `<option value="${Number(t.id)}">${AtendeLabApi.escape(t.nome)}</option>`).join('');
-    }
-
-    async function carregarAtendimentos() {
-        try {
-            const resposta      = await AtendeLabApi.get('atendimentos', 'listar');
-            const atendimentos  = AtendeLabApi.toList(resposta);
-            const tbody         = document.getElementById('tabelaAtendimentos');
-
-            if (!atendimentos.length) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4">Nenhum atendimento registrado.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = atendimentos.map(a => {
-                const pessoa     = labelRegistro(a, 'pessoa_nome', 'pessoa', 'nome_pessoa');
-                const tipo       = labelRegistro(a, 'tipo_nome', 'tipo', 'tipo_atendimento', 'nome_tipo');
-                const responsavel = labelRegistro(a, 'responsavel_nome', 'responsavel', 'usuario', 'usuario_nome', 'nome_usuario');
-                const data       = labelRegistro(a, 'data_atendimento', 'data');
-
-                const classeStatus = a.status === 'concluido'
-                    ? 'text-bg-success'
-                    : a.status === 'em_andamento'
-                    ? 'text-bg-warning'
-                    : 'text-bg-primary';
-
-                return `<tr>
+            return `
+                <tr>
                     <td>${AtendeLabApi.escape(a.id)}</td>
                     <td>${AtendeLabApi.escape(pessoa)}</td>
                     <td>${AtendeLabApi.escape(tipo)}</td>
                     <td>${AtendeLabApi.escape(responsavel)}</td>
                     <td>${AtendeLabApi.escape(data)}</td>
-                    <td><span class="badge ${classeStatus}">${AtendeLabApi.escape(a.status)}</span></td>
+                    <td>
+                        <span class="badge ${classeStatus}">
+                            ${AtendeLabApi.escape(a.status)}
+                        </span>
+                    </td>
                     <td class="text-end">
                         <button class="btn btn-sm btn-outline-primary"
-                            onclick="abrirStatus(${Number(a.id)}, '${AtendeLabApi.escapeAttr(a.status)}')">
+                                onclick="abrirStatus(${Number(a.id)}, '${AtendeLabApi.escapeAttr(a.status)}')">
                             Status
                         </button>
                     </td>
-                </tr>`;
-            }).join('');
-        } catch (error) {
-            AtendeLabApi.showAlert('alerta', error.message, 'danger');
-        }
+                </tr>
+            `;
+        }).join('');
+    } catch (error) {
+        AtendeLabApi.showAlert('alerta', error.message, 'danger');
     }
+}
 
-    formAtendimento.addEventListener('submit', async event => {
-        event.preventDefault();
-        try {
-            await AtendeLabApi.post('atendimentos', 'criar', new FormData(formAtendimento));
-            AtendeLabApi.showAlert('alerta', 'Atendimento registrado com sucesso.');
-            fecharFormulario();
-            await carregarAtendimentos();
-        } catch (error) {
-            AtendeLabApi.showAlert('alerta', error.message, 'danger');
-        }
-    });
-
-    function abrirStatus(id, status) {
-        document.getElementById('statusId').value = id;
-        document.querySelector('#formStatus [name="status"]').value = status || 'aberto';
-        document.querySelector('#formStatus [name="observacao_final"]').value = '';
-        statusModal().show();
+formAtendimento.addEventListener('submit', async event => {
+    event.preventDefault();
+    try {
+        await AtendeLabApi.post('atendimentos', 'criar', new FormData(formAtendimento));
+        AtendeLabApi.showAlert('alerta', 'Atendimento registrado com sucesso.');
+        fecharFormulario();
+        await carregarAtendimentos();
+    } catch (error) {
+        AtendeLabApi.showAlert('alerta', error.message, 'danger');
     }
+});
 
-    document.getElementById('formStatus').addEventListener('submit', async event => {
-        event.preventDefault();
-        try {
-            await AtendeLabApi.post('atendimentos', 'alterarStatus', new FormData(event.target));
-            statusModal().hide();
-            AtendeLabApi.showAlert('alerta', 'Status atualizado com sucesso.');
-            await carregarAtendimentos();
-        } catch (error) {
-            AtendeLabApi.showAlert('alerta', error.message, 'danger');
-        }
-    });
+function abrirStatus(id, status) {
+    document.getElementById('statusId').value = id;
+    document.querySelector('#formStatus [name="status"]').value = status || 'aberto';
+    document.querySelector('#formStatus [name="observacao_final"]').value = '';
+    statusModal().show();
+}
 
-    document.addEventListener('DOMContentLoaded', async () => {
-        try {
-            await carregarCombos();
-            await carregarAtendimentos();
-        } catch (error) {
-            AtendeLabApi.showAlert('alerta', error.message, 'danger');
-        }
-    });
+document.getElementById('formStatus').addEventListener('submit', async event => {
+    event.preventDefault();
+    try {
+        await AtendeLabApi.post('atendimentos', 'alterarStatus', new FormData(event.target));
+        statusModal().hide();
+        AtendeLabApi.showAlert('alerta', 'Status atualizado com sucesso.');
+        await carregarAtendimentos();
+    } catch (error) {
+        AtendeLabApi.showAlert('alerta', error.message, 'danger');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        await carregarCombos();
+        await carregarAtendimentos();
+    } catch (error) {
+        AtendeLabApi.showAlert('alerta', error.message, 'danger');
+    }
+});
 </script>
 
 <?php require __DIR__ . '/../layouts/footer.php'; ?>

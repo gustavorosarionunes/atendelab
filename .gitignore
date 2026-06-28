@@ -1,13 +1,28 @@
-# Sistema operacional
-.DS_Store
-Thumbs.db
+# AtendeLab - .gitignore
+
 # Dependências
 /vendor/
 /node_modules/
-# Ambiente
+
+# Backups do banco
+/database/backups/*.sql
+
+# Arquivos de ambiente
 .env
+.env.local
+
 # Logs
 *.log
-# Arquivos temporários
-*.tmp
-*.bak
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini

@@ -8,7 +8,9 @@ require __DIR__ . '/../layouts/header.php';
         <h1 class="h3 mb-1">Tipos de atendimento</h1>
         <p class="text-secondary mb-0">Categorias utilizadas nos registros de atendimento.</p>
     </div>
-    <button class="btn btn-success" type="button" onclick="novoTipo()">Novo tipo</button>
+    <button class="btn btn-success" type="button" onclick="novoTipo()">
+        Novo tipo
+    </button>
 </div>
 
 <div id="alerta"></div>
@@ -37,7 +39,8 @@ require __DIR__ . '/../layouts/header.php';
             </div>
             <div class="d-flex gap-2 mt-3">
                 <button class="btn btn-success" type="submit">Salvar</button>
-                <button class="btn btn-outline-secondary" type="button" onclick="fecharFormulario()">Cancelar</button>
+                <button class="btn btn-outline-secondary" type="button"
+                        onclick="fecharFormulario()">Cancelar</button>
             </div>
         </form>
     </div>
@@ -64,98 +67,105 @@ require __DIR__ . '/../layouts/header.php';
 </div>
 
 <script>
-    const formTipo       = document.getElementById('formTipo');
-    const cardFormulario = document.getElementById('cardFormulario');
-    const tabelaTipos    = document.getElementById('tabelaTipos');
-    const campoTipoId    = document.getElementById('tipoId');
-    const tituloFormulario = document.getElementById('tituloFormulario');
+const formTipo       = document.getElementById('formTipo');
+const cardFormulario = document.getElementById('cardFormulario');
+const campoTipoId    = document.getElementById('tipoId');
+const tituloForm     = document.getElementById('tituloFormulario');
 
-    function abrirFormulario() {
-        cardFormulario.classList.remove('d-none');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+function abrirFormulario() {
+    cardFormulario.classList.remove('d-none');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-    function fecharFormulario() {
-        cardFormulario.classList.add('d-none');
-        formTipo.reset();
-        campoTipoId.value = '';
-    }
+function fecharFormulario() {
+    cardFormulario.classList.add('d-none');
+    formTipo.reset();
+    campoTipoId.value = '';
+}
 
-    function novoTipo() {
-        fecharFormulario();
-        tituloFormulario.textContent = 'Novo tipo';
-        abrirFormulario();
-    }
+function novoTipo() {
+    fecharFormulario();
+    tituloForm.textContent = 'Novo tipo';
+    abrirFormulario();
+}
 
-    async function carregarTipos() {
-        try {
-            const resposta = await AtendeLabApi.get('tipos', 'listar');
-            const tipos = AtendeLabApi.toList(resposta);
+async function carregarTipos() {
+    try {
+        const tipos = AtendeLabApi.toList(await AtendeLabApi.get('tipos', 'listar'));
+        const tbody = document.getElementById('tabelaTipos');
 
-            if (tipos.length === 0) {
-                tabelaTipos.innerHTML = `<tr><td colspan="4" class="text-center py-4">Nenhum tipo cadastrado.</td></tr>`;
-                return;
-            }
+        if (!tipos.length) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">Nenhum tipo cadastrado.</td></tr>';
+            return;
+        }
 
-            tabelaTipos.innerHTML = tipos.map(tipo => {
-                const classeStatus = tipo.status === 'ativo' ? 'text-bg-success' : 'text-bg-secondary';
-                return `<tr>
+        tbody.innerHTML = tipos.map(tipo => {
+            const classeStatus = tipo.status === 'ativo' ? 'text-bg-success' : 'text-bg-secondary';
+            return `
+                <tr>
                     <td>${AtendeLabApi.escape(tipo.nome)}</td>
                     <td>${AtendeLabApi.escape(tipo.descricao || '')}</td>
-                    <td><span class="badge ${classeStatus}">${AtendeLabApi.escape(tipo.status)}</span></td>
-                    <td class="text-end">
-                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="editarTipo(${Number(tipo.id)})">Editar</button>
-                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="inativarTipo(${Number(tipo.id)})">Inativar</button>
+                    <td>
+                        <span class="badge ${classeStatus}">
+                            ${AtendeLabApi.escape(tipo.status)}
+                        </span>
                     </td>
-                </tr>`;
-            }).join('');
-        } catch (error) {
-            AtendeLabApi.showAlert('alerta', error.message, 'danger');
-        }
+                    <td class="text-end">
+                        <button type="button" class="btn btn-sm btn-outline-primary"
+                                onclick="editarTipo(${Number(tipo.id)})">Editar</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                onclick="inativarTipo(${Number(tipo.id)})">Inativar</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    } catch (error) {
+        AtendeLabApi.showAlert('alerta', error.message, 'danger');
     }
+}
 
-    async function editarTipo(id) {
-        try {
-            const resposta = await AtendeLabApi.get('tipos', 'buscar', { id });
-            const tipo = AtendeLabApi.toObject(resposta);
-            novoTipo();
-            tituloFormulario.textContent = 'Editar tipo';
-            for (const [nomeCampo, valorCampo] of Object.entries(tipo)) {
-                const campo = formTipo.elements.namedItem(nomeCampo);
-                if (campo) campo.value = valorCampo ?? '';
-            }
-        } catch (error) {
-            AtendeLabApi.showAlert('alerta', error.message, 'danger');
+async function editarTipo(id) {
+    try {
+        const tipo = AtendeLabApi.toObject(await AtendeLabApi.get('tipos', 'buscar', { id }));
+        novoTipo();
+        tituloForm.textContent = 'Editar tipo';
+        for (const [key, value] of Object.entries(tipo)) {
+            const campo = formTipo.elements.namedItem(key);
+            if (campo) campo.value = value ?? '';
         }
+    } catch (error) {
+        AtendeLabApi.showAlert('alerta', error.message, 'danger');
     }
+}
 
-    formTipo.addEventListener('submit', async event => {
-        event.preventDefault();
-        const id = campoTipoId.value;
-        const acao = id ? 'atualizar' : 'criar';
-        const mensagemSucesso = id ? 'Tipo atualizado com sucesso.' : 'Tipo cadastrado com sucesso.';
-        try {
-            await AtendeLabApi.post('tipos', acao, new FormData(formTipo));
-            AtendeLabApi.showAlert('alerta', mensagemSucesso, 'success');
-            fecharFormulario();
-            await carregarTipos();
-        } catch (error) {
-            AtendeLabApi.showAlert('alerta', error.message, 'danger');
-        }
-    });
+formTipo.addEventListener('submit', async event => {
+    event.preventDefault();
+    const id     = campoTipoId.value;
+    const acao   = id ? 'atualizar' : 'criar';
+    const msgOk  = id ? 'Tipo atualizado com sucesso.' : 'Tipo cadastrado com sucesso.';
 
-    async function inativarTipo(id) {
-        if (!confirm('Deseja realmente inativar este tipo?')) return;
-        try {
-            await AtendeLabApi.post('tipos', 'inativar', { id });
-            AtendeLabApi.showAlert('alerta', 'Tipo inativado com sucesso.', 'success');
-            await carregarTipos();
-        } catch (error) {
-            AtendeLabApi.showAlert('alerta', error.message, 'danger');
-        }
+    try {
+        await AtendeLabApi.post('tipos', acao, new FormData(formTipo));
+        AtendeLabApi.showAlert('alerta', msgOk);
+        fecharFormulario();
+        await carregarTipos();
+    } catch (error) {
+        AtendeLabApi.showAlert('alerta', error.message, 'danger');
     }
+});
 
-    document.addEventListener('DOMContentLoaded', carregarTipos);
+async function inativarTipo(id) {
+    if (!confirm('Deseja realmente inativar este tipo?')) return;
+    try {
+        await AtendeLabApi.post('tipos', 'inativar', { id });
+        AtendeLabApi.showAlert('alerta', 'Tipo inativado com sucesso.');
+        await carregarTipos();
+    } catch (error) {
+        AtendeLabApi.showAlert('alerta', error.message, 'danger');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', carregarTipos);
 </script>
 
 <?php require __DIR__ . '/../layouts/footer.php'; ?>

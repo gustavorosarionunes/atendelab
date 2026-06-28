@@ -1,36 +1,25 @@
 <?php
 
-// Importa a conexão com o banco de dados.
-require_once __DIR__ . '/../../config/database.php';
+declare(strict_types=1);
 
-// Importa funções auxiliares de autenticação e sessão.
+require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../Middleware/auth.php';
+
+// ============================================================
+// AtendeLab - AuthController
+// ============================================================
 
 class AuthController
 {
-    // Armazena a conexão PDO.
-    private PDO $pdo;
-
-    public function __construct()
-    {
-        // Importa o arquivo que inicializa o objeto $pdo.
-        require __DIR__ . '/../../config/database.php';
-
-        // Disponibiliza a conexão para os métodos da classe.
-        $this->pdo = $pdo;
-    }
-
     public function exibirLogin(): void
     {
         if (usuarioAutenticado()) {
-            header('Location: ?controller=auth&action=dashboard');
+            header('Location: /atendelab/public/?controller=auth&action=dashboard');
             exit;
         }
 
-        $erroLogin = $_SESSION['erro_login'] ?? null;
-        $mensagem  = $_SESSION['mensagem']   ?? null;
-
-        unset($_SESSION['erro_login'], $_SESSION['mensagem']);
+        $erroLogin = null;
+        $mensagem  = $_GET['mensagem'] ?? null;
 
         require __DIR__ . '/../Views/auth/login.php';
     }
@@ -38,81 +27,71 @@ class AuthController
     public function entrar(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: ?controller=auth&action=login');
+            header('Location: /atendelab/public/?controller=auth&action=login');
             exit;
         }
 
-        $email = trim($_POST['email'] ?? '');
+        $email = trim(filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL) ?? '');
         $senha = $_POST['senha'] ?? '';
 
-        if ($email === '' || $senha === '') {
-            $_SESSION['erro_login'] = 'Informe o e-mail e a senha.';
-
-            header('Location: ?controller=auth&action=login');
-            exit;
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL) || $senha === '') {
+            $erroLogin = 'E-mail ou senha inválidos.';
+            require __DIR__ . '/../Views/auth/login.php';
+            return;
         }
 
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $_SESSION['erro_login'] = 'Informe um e-mail valido.';
+        try {
+            $pdo  = conectar();
+            $stmt = $pdo->prepare(
+                "SELECT id, nome, email, senha, perfil, status
+                   FROM usuarios
+                  WHERE email = :email
+                  LIMIT 1"
+            );
+            $stmt->execute([':email' => $email]);
+            $usuario = $stmt->fetch();
 
-            header('Location: ?controller=auth&action=login');
+            if (
+                !$usuario
+                || !password_verify($senha, $usuario['senha'])
+                || $usuario['status'] !== 'ativo'
+            ) {
+                $erroLogin = 'E-mail ou senha inválidos.';
+                require __DIR__ . '/../Views/auth/login.php';
+                return;
+            }
+
+            session_regenerate_id(true);
+
+            $_SESSION['usuario'] = [
+                'id'     => (int) $usuario['id'],
+                'nome'   => $usuario['nome'],
+                'email'  => $usuario['email'],
+                'perfil' => $usuario['perfil'],
+            ];
+
+            header('Location: /atendelab/public/?controller=auth&action=dashboard');
             exit;
+
+        } catch (PDOException $e) {
+            $erroLogin = 'Erro interno. Tente novamente.';
+            require __DIR__ . '/../Views/auth/login.php';
         }
-
-        $sql = 'SELECT id, nome, email, senha, perfil, status
-                FROM usuarios
-                WHERE email = :email
-                LIMIT 1';
-
-        $stmt = $this->pdo->prepare($sql);
-
-        $stmt->bindValue(':email', $email);
-
-        $stmt->execute();
-
-        $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-
-        if (
-            !$usuario
-            || $usuario['status'] !== 'ativo'
-            || !password_verify($senha, $usuario['senha'])
-        ) {
-            $_SESSION['erro_login'] = 'E-mail ou senha invalidos.';
-
-            header('Location: ?controller=auth&action=login');
-            exit;
-        }
-
-        session_regenerate_id(true);
-
-        $_SESSION['usuario'] = [
-            'id'     => $usuario['id'],
-            'nome'   => $usuario['nome'],
-            'email'  => $usuario['email'],
-            'perfil' => $usuario['perfil'],
-        ];
-
-        header('Location: ?controller=auth&action=dashboard');
-        exit;
     }
 
     public function dashboard(): void
     {
         exigirAutenticacao();
-
+        $tituloPagina = 'Dashboard';
         require __DIR__ . '/../Views/dashboard/index.php';
     }
 
     public function logout(): void
     {
-        // Remove os dados armazenados na sessão.
         $_SESSION = [];
 
-        // Remove o cookie da sessão, caso esteja sendo utilizado.
         if (ini_get('session.use_cookies')) {
             $params = session_get_cookie_params();
-
             setcookie(
                 session_name(),
                 '',
@@ -124,17 +103,9 @@ class AuthController
             );
         }
 
-        // Encerra a sessão atual.
         session_destroy();
 
-        // Inicia nova sessão apenas para enviar a mensagem de retorno.
-        session_start();
-
-        // Mensagem exibida após o logout.
-        $_SESSION['mensagem'] = 'Sessao encerrada com sucesso.';
-
-        // Retorna para a tela de login.
-        header('Location: ?controller=auth&action=login');
+        header('Location: /atendelab/public/?controller=auth&action=login&mensagem=logout');
         exit;
     }
 }

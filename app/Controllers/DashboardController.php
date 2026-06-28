@@ -1,53 +1,64 @@
 <?php
 
+declare(strict_types=1);
+
+require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../Middleware/auth.php';
+
+// ============================================================
+// AtendeLab - DashboardController
+// ============================================================
+
 class DashboardController
 {
-    private PDO $pdo;
-
-    public function __construct()
-    {
-        require __DIR__ . '/../../config/database.php';
-        $this->pdo = $pdo;
-    }
-
-    private function json(array $dados, int $status = 200): void
-    {
-        http_response_code($status);
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode($dados, JSON_UNESCAPED_UNICODE);
-    }
-
     public function resumo(): void
     {
-        $totalPessoas = (int) $this->pdo
-            ->query('SELECT COUNT(*) FROM pessoas')
-            ->fetchColumn();
+        exigirAutenticacao();
+        header('Content-Type: application/json; charset=UTF-8');
 
-        $totalTipos = (int) $this->pdo
-            ->query('SELECT COUNT(*) FROM tipos_atendimentos')
-            ->fetchColumn();
+        try {
+            $pdo = conectar();
 
-        $totalAtendimentos = (int) $this->pdo
-            ->query('SELECT COUNT(*) FROM atendimentos')
-            ->fetchColumn();
+            $totalPessoas = (int) $pdo
+                ->query("SELECT COUNT(*) FROM pessoas WHERE status = 'ativo'")
+                ->fetchColumn();
 
-        $recentes = $this->pdo->query(
-            'SELECT a.id, p.nome AS pessoa_nome, t.nome AS tipo_nome,
-                    a.status, a.data_atendimento
-             FROM atendimentos a
-             INNER JOIN pessoas p ON p.id = a.pessoa_id
-             INNER JOIN tipos_atendimentos t ON t.id = a.tipo_atendimento_id
-             ORDER BY a.id DESC
-             LIMIT 5'
-        )->fetchAll(PDO::FETCH_ASSOC);
+            $totalTipos = (int) $pdo
+                ->query("SELECT COUNT(*) FROM tipos_atendimentos WHERE status = 'ativo'")
+                ->fetchColumn();
 
-        $this->json([
-            'indicadores' => [
-                'total_pessoas'      => $totalPessoas,
-                'total_tipos'        => $totalTipos,
-                'total_atendimentos' => $totalAtendimentos,
-            ],
-            'atendimentos_recentes' => $recentes,
-        ]);
+            $totalAtendimentos = (int) $pdo
+                ->query("SELECT COUNT(*) FROM atendimentos")
+                ->fetchColumn();
+
+            $stmtRecentes = $pdo->query(
+                "SELECT a.id,
+                        p.nome  AS pessoa,
+                        t.nome  AS tipo,
+                        u.nome  AS responsavel,
+                        a.data_atendimento,
+                        a.status
+                   FROM atendimentos a
+                   JOIN pessoas            p ON p.id = a.pessoa_id
+                   JOIN tipos_atendimentos t ON t.id = a.tipo_atendimento_id
+                   JOIN usuarios           u ON u.id = a.usuario_id
+                  ORDER BY a.criado_em DESC
+                  LIMIT 5"
+            );
+            $recentes = $stmtRecentes->fetchAll();
+
+            echo json_encode([
+                'indicadores' => [
+                    'total_pessoas'      => $totalPessoas,
+                    'total_tipos'        => $totalTipos,
+                    'total_atendimentos' => $totalAtendimentos,
+                ],
+                'atendimentos_recentes' => $recentes,
+            ]);
+
+        } catch (PDOException $e) {
+            http_response_code(500);
+            echo json_encode(['erro' => 'Erro ao carregar resumo.']);
+        }
     }
 }

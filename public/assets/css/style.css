@@ -1,3 +1,7 @@
+/* ============================================================
+   AtendeLab - Folha de estilos principal
+   ============================================================ */
+
 :root {
     --atendelab-green: #198754;
 }
@@ -6,6 +10,7 @@ body {
     min-height: 100vh;
 }
 
+/* Login */
 .login-card {
     width: min(100%, 430px);
 }
@@ -20,16 +25,20 @@ body {
     color: white;
     font-weight: 700;
     letter-spacing: .04em;
+    font-size: 1.1rem;
 }
 
+/* Cards */
 .card {
     border-radius: 14px;
 }
 
+/* Tabelas */
 .table th {
     white-space: nowrap;
 }
 
+/* Textarea */
 textarea {
     resize: vertical;
 }
