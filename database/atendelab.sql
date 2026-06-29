@@ -83,11 +83,11 @@ CREATE TABLE `pessoas` (
 --
 
 INSERT INTO `pessoas` (`id`, `nome`, `documento`, `telefone`, `email`, `curso`, `periodo`, `observacoes`, `status`, `criado_em`, `atualizado_em`) VALUES
-(1, 'Joao da Silva Atualizado', '123.456.789-00', '(47) 99999-9999', 'joao.silva@exemplo.com', 'Engenharia de Software', '6o', '', 'ativo', '2026-06-15 23:03:26', '2026-06-15 23:33:25'),
-(2, 'Ana Carolina', '987.654.321-00', '(47) 99999-0002', 'ana.carolina@exemplo.com', 'Sistemas de Informacao', '7o', NULL, 'ativo', '2026-06-15 23:03:26', '2026-06-15 23:03:26'),
-(3, 'Maria de Souza', '111.222.333-44', '(47) 99999-1234', 'maria.souza@exemplo.com', 'Engenharia de Software', '5o', 'Cadastro de teste', 'ativo', '2026-06-15 23:32:54', '2026-06-15 23:32:54'),
-(4, 'Carlos Henrique Souza', '321.654.987-10', '(47) 99999-0010', 'carlos.souza@exemplo.com', 'Engenharia de Software', '3o', NULL, 'ativo', '2026-06-15 23:40:26', '2026-06-15 23:40:26'),
-(5, 'Mariana Oliveira Costa', '741.852.963-20', '(47) 99999-0011', 'mariana.oliveira@exemplo.com', 'Sistemas de Informacao', '5o', NULL, 'ativo', '2026-06-15 23:40:26', '2026-06-15 23:40:26');
+(1, 'Gustavo do Rosário Nunes', '123.456.789-00', '(47) 99999-9658', 'gustavo@exemplo.com', 'Engenharia de Software', '6o', '', 'ativo', '2026-06-15 23:03:26', '2026-06-15 23:33:25'),
+(2, 'Vitor Roque', '987.654.321-00', '(47) 99999-3256', 'vitor.roque@exemplo.com', 'Sistemas de Informacao', '7o', NULL, 'ativo', '2026-06-15 23:03:26', '2026-06-15 23:03:26'),
+(3, 'Vitoria Carolina', '111.222.333-44', '(47) 99999-145', 'vitoria@exemplo.com', 'Engenharia de Software', '5o', 'Cadastro de teste', 'ativo', '2026-06-15 23:32:54', '2026-06-15 23:32:54'),
+(4, 'Leandro Rossi', '321.654.987-10', '(47) 99999-4128', 'leandro@exemplo.com', 'Engenharia de Software', '3o', NULL, 'ativo', '2026-06-15 23:40:26', '2026-06-15 23:40:26'),
+(5, 'Mariana Fernanda', '741.852.963-20', '(47) 99999-7852', 'maria.fernanda@exemplo.com', 'Sistemas de Informacao', '5o', NULL, 'ativo', '2026-06-15 23:40:26', '2026-06-15 23:40:26');
 
 -- --------------------------------------------------------
 
