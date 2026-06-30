@@ -46,17 +46,17 @@ CREATE TABLE `atendimentos` (
 --
 
 INSERT INTO `atendimentos` (`id`, `pessoa_id`, `tipo_atendimento_id`, `usuario_id`, `descricao`, `status`, `data_atendimento`, `horario_atendimento`, `observacao_final`, `criado_em`, `atualizado_em`) VALUES
-(21, 1, 1, 1, 'Duvida sobre criterios de avaliacao da disciplina de Calculo.', 'concluido', '2026-06-01', '09:00:00', 'Criterios explicados e material de apoio enviado.', '2026-06-15 23:40:34', '2026-06-15 23:40:34'),
-(22, 2, 2, 1, 'Orientacao sobre estrutura do TCC e prazos de entrega.', 'concluido', '2026-06-02', '10:30:00', 'Aluna orientada sobre normas ABNT e cronograma.', '2026-06-15 23:40:34', '2026-06-15 23:40:34'),
-(23, 3, 3, 1, 'Problema de acesso ao sistema academico apos troca de senha.', 'concluido', '2026-06-03', '14:00:00', 'Senha redefinida e acesso restaurado.', '2026-06-15 23:40:34', '2026-06-15 23:40:34'),
-(24, 4, 4, 1, 'Solicitacao de declaracao de matricula para estagio.', 'concluido', '2026-06-04', '08:30:00', 'Declaracao emitida e entregue ao aluno.', '2026-06-15 23:40:34', '2026-06-15 23:40:34'),
-(25, 5, 5, 1, 'Agendamento do laboratorio de redes para apresentacao de projeto.', 'concluido', '2026-06-05', '11:00:00', 'Laboratorio reservado para o dia 15/06 das 14h as 16h.', '2026-06-15 23:40:34', '2026-06-15 23:40:34'),
-(26, 1, 2, 1, 'Revisao de nota em trabalho da disciplina de Engenharia de Software.', 'em_andamento', '2026-06-09', '10:00:00', NULL, '2026-06-15 23:40:34', '2026-06-15 23:40:34'),
-(27, 2, 1, 1, 'Duvida sobre filtros por status em listagem de atendimentos.', 'em_andamento', '2026-06-10', '11:30:00', NULL, '2026-06-15 23:40:34', '2026-06-15 23:40:34'),
-(28, 3, 4, 1, 'Solicitacao de historico escolar para processo seletivo.', 'aberto', '2026-06-11', '08:00:00', NULL, '2026-06-15 23:40:34', '2026-06-15 23:40:34'),
-(29, 4, 5, 1, 'Reserva do laboratorio de quimica para aula experimental.', 'aberto', '2026-06-12', '09:00:00', NULL, '2026-06-15 23:40:34', '2026-06-15 23:40:34'),
-(30, 5, 2, 1, 'Orientacao sobre documentacao academica para intercambio.', 'aberto', '2026-06-13', '14:00:00', NULL, '2026-06-15 23:40:34', '2026-06-15 23:40:34'),
-(31, 1, 1, 1, 'Duvida sobre atividade avaliativa.', 'aberto', '2026-06-15', '14:30:00', NULL, '2026-06-15 23:42:01', '2026-06-15 23:42:01');
+(21, 1, 1, 1, 'Dúvida sobre prazo de entrega do relatório final da matéria de Algoritmos.', 'concluido', '2026-06-01', '09:00:00', 'Esclarecido o cronograma e enviado o link do portal de envios.', '2026-06-15 23:40:34', '2026-06-15 23:40:34'),
+(22, 2, 2, 1, 'Solicitação de mentoria para formatação de projeto de pesquisa acadêmica.', 'concluido', '2026-06-02', '10:30:00', 'Estudante instruído sobre as regras gerais e agendado novo encontro.', '2026-06-15 23:40:34', '2026-06-15 23:40:34'),
+(23, 3, 3, 1, 'Instabilidade na conexão do Wi-Fi institucional no bloco central.', 'concluido', '2026-06-03', '14:00:00', 'Ponto de acesso reiniciado e sinal normalizado no local.', '2026-06-15 23:40:34', '2026-06-15 23:40:34'),
+(24, 4, 4, 1, 'Pedido de validação de horas complementares de eventos externos.', 'concluido', '2026-06-04', '08:30:00', 'Certificados validados e carga horária computada no sistema.', '2026-06-15 23:40:34', '2026-06-15 23:40:34'),
+(25, 5, 5, 1, 'Reserva de espaço multimídia para ensaio de banca examinadora.', 'concluido', '2026-06-05', '11:00:00', 'Sala reservada com sucesso para a data solicitada.', '2026-06-15 23:40:34', '2026-06-15 23:40:34'),
+(26, 1, 2, 1, 'Pedido de revisão de pontuação na avaliação prática de banco de dados.', 'em_andamento', '2026-06-09', '10:00:00', NULL, '2026-06-15 23:40:34', '2026-06-15 23:40:34'),
+(27, 2, 1, 1, 'Dificuldade para localizar os editais de monitoria abertos na página.', 'em_andamento', '2026-06-10', '11:30:00', NULL, '2026-06-15 23:40:34', '2026-06-15 23:40:34'),
+(28, 3, 4, 1, 'Solicitação de segunda via de carteirinha estudantil por perda.', 'aberto', '2026-06-11', '08:00:00', NULL, '2026-06-15 23:40:34', '2026-06-15 23:40:34'),
+(29, 4, 5, 1, 'Agendamento de bancada de testes para experimento de física aplicada.', 'aberto', '2026-06-12', '09:00:00', NULL, '2026-06-15 23:40:34', '2026-06-15 23:40:34'),
+(30, 5, 2, 1, 'Informações sobre os requisitos para inscrição no programa de bolsas.', 'aberto', '2026-06-13', '14:00:00', NULL, '2026-06-15 23:40:34', '2026-06-15 23:40:34'),
+(31, 1, 1, 1, 'Dúvida pontual referente ao gabarito da última lista de exercícios.', 'aberto', '2026-06-15', '14:30:00', NULL, '2026-06-15 23:42:01', '2026-06-15 23:42:01');
 
 -- --------------------------------------------------------
 
@@ -83,11 +83,11 @@ CREATE TABLE `pessoas` (
 --
 
 INSERT INTO `pessoas` (`id`, `nome`, `documento`, `telefone`, `email`, `curso`, `periodo`, `observacoes`, `status`, `criado_em`, `atualizado_em`) VALUES
-(1, 'Gustavo do Rosário Nunes', '123.456.789-00', '(47) 99999-9658', 'gustavo@exemplo.com', 'Engenharia de Software', '6o', '', 'ativo', '2026-06-15 23:03:26', '2026-06-15 23:33:25'),
-(2, 'Vitor Roque', '987.654.321-00', '(47) 99999-3256', 'vitor.roque@exemplo.com', 'Sistemas de Informacao', '7o', NULL, 'ativo', '2026-06-15 23:03:26', '2026-06-15 23:03:26'),
-(3, 'Vitoria Carolina', '111.222.333-44', '(47) 99999-145', 'vitoria@exemplo.com', 'Engenharia de Software', '5o', 'Cadastro de teste', 'ativo', '2026-06-15 23:32:54', '2026-06-15 23:32:54'),
-(4, 'Leandro Rossi', '321.654.987-10', '(47) 99999-4128', 'leandro@exemplo.com', 'Engenharia de Software', '3o', NULL, 'ativo', '2026-06-15 23:40:26', '2026-06-15 23:40:26'),
-(5, 'Mariana Fernanda', '741.852.963-20', '(47) 99999-7852', 'maria.fernanda@exemplo.com', 'Sistemas de Informacao', '5o', NULL, 'ativo', '2026-06-15 23:40:26', '2026-06-15 23:40:26');
+(1, 'Gustavo do Rosário Nunes', '415.823.961-44', '(11) 98254-1174', 'gustavo.nunes@ficticio.com', 'Análise e Desenvolvimento de Sistemas', '2º', '', 'ativo', '2026-06-15 23:03:26', '2026-06-15 23:33:25'),
+(2, 'Vitor Roque', '263.147.859-05', '(21) 97112-8836', 'vitor.roque@ficticio.com', 'Ciência da Computação', '4º', NULL, 'ativo', '2026-06-15 23:03:26', '2026-06-15 23:03:26'),
+(3, 'Vitoria Carolina', '842.369.157-88', '(31) 99652-3214', 'vitoria.carolina@ficticio.com', 'Engenharia de Computação', '8º', 'Aluno bolsista parcial', 'ativo', '2026-06-15 23:32:54', '2026-06-15 23:32:54'),
+(4, 'Leandro Rossi', '619.734.258-12', '(51) 98145-6692', 'leandro.rossi@ficticio.com', 'Ciência da Computação', '1º', NULL, 'ativo', '2026-06-15 23:40:26', '2026-06-15 23:40:26'),
+(5, 'Mariana Fernanda', '501.628.934-70', '(81) 98823-1457', 'mariana.fernanda@ficticio.com', 'Análise e Desenvolvimento de Sistemas', '5º', NULL, 'ativo', '2026-06-15 23:40:26', '2026-06-15 23:40:26');
 
 -- --------------------------------------------------------
 
